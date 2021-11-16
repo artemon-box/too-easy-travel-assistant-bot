@@ -1,20 +1,13 @@
-import requests
-import os
-import math
-
-# url = "https://hotels4.p.rapidapi.com/locations/search"
-#
-# querystring = {"query": "new york", "locale": "en_US"}
-#
-# headers = {
-#     'x-rapidapi-host': "hotels4.p.rapidapi.com",
-#     'x-rapidapi-key': os.environ['RAPIDAPI_KEY']
-#     }
-#
-# response = requests.request("GET", url, headers=headers, params=querystring)
-#
-# print(response.text)
+from datetime import datetime
 
 
-def get_response(command):
-    return f'Тут будет ответ на команду {command}, а пока вот вам число пи 4 раза {math.pi, math.pi, math.pi, math.pi}'
+def write_log(user, command: str, data):
+    log_date = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+    with open(f'{user}.log', 'a', encoding='utf-8') as file:
+        file.write(f'{log_date} | {command}\t| {data}\n')
+
+
+def read_log(user: str):
+    with open(f'{user}.log', 'r', encoding='utf-8') as file:
+        result = file.read()
+    return result

@@ -1,6 +1,5 @@
 import requests
 import os
-import math
 
 # url = "https://hotels4.p.rapidapi.com/locations/search"
 #
@@ -16,5 +15,12 @@ import math
 # print(response.text)
 
 
-def get_response(command):
-    return f'Тут будет ответ на команду {command}, а пока вот вам число пи 3 раза {math.pi, math.pi, math.pi}'
+def get_response(city, hotels_number, upload_photos, photos_number, price_range, distance_range):
+    return f'Запрашиваем город: {city}\nДиапазон цен: {price_range}' \
+           f'\nДиапазон расстояния, на котором находится отель от центра: {distance_range}' \
+           f'\nКоличество отелей: {hotels_number}\nЗагружать фото: {upload_photos}' \
+           f'\nКоличество фотографий: {photos_number}' if upload_photos \
+        else f'Запрашиваем город: {city}\nДиапазон цен: {price_range}' \
+           f'\nДиапазон расстояния, на котором находится отель от центра: {distance_range}' \
+           f'\nКоличество отелей: {hotels_number}', \
+           'Информация для лог-файла'
