@@ -14,7 +14,7 @@ def read_log(user: str) -> str:
     if os.stat(path).st_size:
         with open(path, 'r', encoding='utf-8') as file:
             result = file.read()
-        return result
+        return result[-4096:]
     return 'История поиска пока пуста.'
 
 
