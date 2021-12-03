@@ -2,7 +2,7 @@
 ## [@TooEasyTravel_assistant_bot](https://t.me/TooEasyTravel_assistant_bot) 
 
 ![](pics/pic1.jpg)
-###
+
 ###Для работы бота используется открытый API Hotels, который расположен на сайте rapidapi.com.
 ### API и документации к ним:
 [Документация API Hotels](https://rapidapi.com/apidojo/api/hotels4)  

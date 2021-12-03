@@ -1,9 +1,10 @@
 import telebot
 from telebot import types
+from telebot.types import Message
 import os
 from loguru import logger
 from botrequests import lowprice, highprice, bestdeal, history
-from user import User
+from user import Users
 from telegram_bot_calendar import DetailedTelegramCalendar, LSTEP
 from datetime import date, timedelta
 
@@ -32,13 +33,13 @@ numbers_translating: dict = {
 
 @bot.message_handler(commands=['help'])
 @logger.catch
-def send_help_message(message) -> None:
+def send_help_message(message: Message) -> None:
     """
     Функция отправляет пользователю сообщение со списком доступных команд.
-    :param message: Объект, чат с пользователем.
+    :param message: Message
     :return: None
     """
-    user = User.get_user(message.from_user.id)
+    user = Users.get_user(message.from_user.id)
     logger.info(f'user_id: {user.user_id}\t| function: send_help_message\t| message: {message.text}')
 
     bot.send_message(user.user_id, help_message)
@@ -46,17 +47,17 @@ def send_help_message(message) -> None:
 
 @bot.message_handler(commands=['lowprice', 'highprice', 'bestdeal'])
 @logger.catch
-def starting_function(message) -> None:
+def starting_function(message: Message) -> None:
     """
         Функция запрашивает город в котором искать отели и запускает цепочку инструкций для получения конечного
         результата запроса в зависимости от выбранной пользователем команды.
-        :param message: Объект, чат с пользователем.
+        :param message: Message
         :return: None
     """
 
     logger.info(f'user_id: {message.from_user.id}\t| function: get_prices\t| message: {message.text}')
 
-    user = User.get_user(message.from_user.id)
+    user = Users.get_user(message.from_user.id)
     user.command = message.text
 
     bot.send_message(user.user_id, 'Введите город')
@@ -64,17 +65,17 @@ def starting_function(message) -> None:
 
 
 @logger.catch
-def get_city(message) -> None:
+def get_city(message: Message) -> None:
     """
     Функция записывает искомый город в атрибут пользователя, запрашивает дату въезда в гостиницу
     инициализирует первый календарь и выводит его пользователю для ввода даты въезда.
-    :param message: Объект, чат с пользователем.
+    :param message: Message
     :return: None
     """
 
     logger.info(f'user_id: {message.from_user.id}\t| function: get_city\t| message: {message.text}')
 
-    user = User.get_user(message.from_user.id)
+    user = Users.get_user(message.from_user.id)
     user.city = message.text
     bot.send_message(user.user_id, 'Введите дату въезда')
     calendar, step = DetailedTelegramCalendar(
@@ -96,7 +97,7 @@ def get_arrival_date(call) -> None:
     :param call: Объект, чат с пользователем.
     :return: None
     """
-    user = User.get_user(call.message.chat.id)
+    user = Users.get_user(call.message.chat.id)
     logger.info(f'user_id: {user.user_id}\t| function: get_arrival_date\t| message: {call.data}')
 
     result, key, step = DetailedTelegramCalendar(calendar_id=1, min_date=date.today(), locale='ru').process(call.data)
@@ -125,7 +126,7 @@ def get_departure_date(call) -> None:
     :param call: Объект, чат с пользователем.
     :return: None
     """
-    user = User.get_user(call.message.chat.id)
+    user = Users.get_user(call.message.chat.id)
     logger.info(f'user_id: {user.user_id}\t| function: get_departure_date\t| message: {call.data}')
 
     result, key, step = DetailedTelegramCalendar(
@@ -163,7 +164,7 @@ def get_hotels_number(call) -> None:
     :return: None
     """
     logger.info(f'user_id: {call.message.chat.id}\t| function: get_hotels_number\t| message: {call.data}')
-    user = User.get_user(call.message.chat.id)
+    user = Users.get_user(call.message.chat.id)
 
     user.hotels_number = int(call.data)
 
@@ -185,7 +186,7 @@ def upload_photo_question(call) -> None:
     :param call: Объект, чат с пользователем.
     :return: None
     """
-    user = User.get_user(call.message.chat.id)
+    user = Users.get_user(call.message.chat.id)
     logger.info(f'user_id: {user.user_id}\t| function: upload_photo_question\t| message: {call.data}')
 
     if call.data == 'Да':
@@ -280,7 +281,7 @@ def get_photos_number(call) -> None:
     :param call: Объект, чат с пользователем.
     :return: None
     """
-    user = User.get_user(call.message.chat.id)
+    user = Users.get_user(call.message.chat.id)
     logger.info(f'user_id: {user.user_id}\t| function: get_photos_number\t| message: {call.data}')
 
     user.number_photos = numbers_translating[call.data]
@@ -392,13 +393,13 @@ def get_photos_number(call) -> None:
 
 
 @logger.catch
-def price_range(message) -> None:
+def price_range(message: Message) -> None:
     """
     Функция записывает максимальную цену в атрибут пользователя и запрашивает максимальное расстояние от центра города.
-    :param message: Объект, чат с пользователем.
+    :param message: Message
     :return: None
     """
-    user = User.get_user(message.from_user.id)
+    user = Users.get_user(message.from_user.id)
     logger.info(f'user_id: {user.user_id}\t| function: price_range\t| message: {message.text}')
 
     if not message.text.isdigit():
@@ -413,15 +414,15 @@ def price_range(message) -> None:
 
 
 @logger.catch
-def distance_range(message) -> None:
+def distance_range(message: Message) -> None:
     """
     Функция записывает максимальное расстояние в атрибут пользователя и запрашивает количество отелей которые
     необходимо вывести в результате.
-    :param message: Объект, чат с пользователем.
+    :param message: Message
     :return: None
     """
     logger.info(f'user_id: {message.from_user.id}\t| function: distance_range\t| message: {message.text}')
-    user = User.get_user(message.from_user.id)
+    user = Users.get_user(message.from_user.id)
 
     if not message.text.isdigit():
         bot.send_message(user.user_id, 'Ошибка ввода. Введите число цифрами.')
@@ -437,29 +438,29 @@ def distance_range(message) -> None:
 
 @bot.message_handler(commands=['history'])
 @logger.catch
-def history_command(message) -> None:
+def history_command(message: Message) -> None:
     """
     Функция отлавливает команду "/history" и выводит пользователю историю его запросов.
-    :param message: Объект, чат с пользователем.
+    :param message: Message
     :return: None
     """
     logger.info(f'user_id: {message.from_user.id}\t| function: history_command\t| message: {message.text}')
-    user = User.get_user(message.from_user.id)
+    user = Users.get_user(message.from_user.id)
 
     bot.send_message(user.user_id, history.read_log(user.user_id))
 
 
 @bot.message_handler(commands=['clearhistory'])
 @logger.catch
-def clear_history_command(message) -> None:
+def clear_history_command(message: Message) -> None:
     """
     Функция отлавливает команду "/clearhistory" и спрашивает у пользователя действительно ли он хочет очистить историю
     поиска.
-    :param message: Объект, чат с пользователем.
+    :param message: Message
     :return: None
     """
     logger.info(f'user_id: {message.from_user.id}\t| function: clearhistory_command\t| message: {message.text}')
-    user = User.get_user(message.from_user.id)
+    user = Users.get_user(message.from_user.id)
 
     keyboard = types.InlineKeyboardMarkup(row_width=2)
     key_yes = types.InlineKeyboardButton(text='Да', callback_data='y')
@@ -472,7 +473,7 @@ def clear_history_command(message) -> None:
 @logger.catch
 def clear_history(call) -> None:
 
-    user = User.get_user(call.message.chat.id)
+    user = Users.get_user(call.message.chat.id)
     logger.info(f'user_id: {user.user_id}\t| function: clear_history\t| message: {call.data}')
 
     if call.data == 'y':
@@ -484,11 +485,11 @@ def clear_history(call) -> None:
 
 @bot.message_handler(content_types=['text'])
 @logger.catch
-def get_text_messages(message) -> None:
+def get_text_messages(message: Message) -> None:
     """
     Функция отлавливает приветственные и прощальные сообщения, выводит пользователю ответы на них.
     Реагирует на некорректные сообщения, предлагает доступные команды.
-    :param message:
+    :param message: Message
     :return: None
     """
     logger.info(f'user_id: {message.from_user.id}\t| function: get_text_messages\t| message: {message.text}')
@@ -503,7 +504,7 @@ def get_text_messages(message) -> None:
 
 
 @logger.catch
-def form_response_string(user_id: str, num: int, tpl: tuple) -> tuple[str, str]:
+def form_response_string(user_id: int, num: int, tpl: tuple) -> tuple[str, str]:
     """
     Функция формирует ответное сообщение пользователю по результатам запроса.
     :param user_id: str Идентификатор пользователя.
@@ -511,7 +512,7 @@ def form_response_string(user_id: str, num: int, tpl: tuple) -> tuple[str, str]:
     :param tpl: tuple Кортеж с результатами запроса.
     :return: tuple Кортеж содержит 2 элемента: 1- ответная строка пользователю, 2- строка для записи в файл истории.
     """
-    user = User.get_user(user_id)
+    user = Users.get_user(user_id)
     logger.info(f'user_id: {user_id}\t| function: form_response_string\t|')
 
     length_of_stay = user.departure_date - user.arrival_date
