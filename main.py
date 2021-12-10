@@ -1,6 +1,5 @@
 import telebot
-from telebot import types
-from telebot.types import Message
+from telebot.types import Message, InlineKeyboardMarkup, InlineKeyboardButton
 import os
 from loguru import logger
 from botrequests import lowprice, highprice, bestdeal, history
@@ -148,8 +147,8 @@ def get_departure_date(call) -> None:
             bot.register_next_step_handler(call.message, price_range)
 
         else:
-            keyboard = types.InlineKeyboardMarkup(row_width=5)
-            keys = [types.InlineKeyboardButton(text=f'{i}', callback_data=f'{i}') for i in range(1, 11)]
+            keyboard = InlineKeyboardMarkup(row_width=5)
+            keys = [InlineKeyboardButton(text=f'{i}', callback_data=f'{i}') for i in range(1, 11)]
             keyboard.add(*keys)
             bot.send_message(user.user_id, 'Сколько отелей вывести в результате?', reply_markup=keyboard)
 
@@ -168,9 +167,9 @@ def get_hotels_number(call) -> None:
 
     user.hotels_number = int(call.data)
 
-    keyboard = types.InlineKeyboardMarkup(row_width=2)
-    key_yes = types.InlineKeyboardButton(text='Да', callback_data='Да')
-    key_no = types.InlineKeyboardButton(text='Нет', callback_data='Нет')
+    keyboard = InlineKeyboardMarkup(row_width=2)
+    key_yes = InlineKeyboardButton(text='Да', callback_data='Да')
+    key_no = InlineKeyboardButton(text='Нет', callback_data='Нет')
     keyboard.add(key_yes, key_no)
     bot.send_message(user.user_id, 'Нужны ли фотографии отелей?', reply_markup=keyboard)
 
@@ -192,8 +191,8 @@ def upload_photo_question(call) -> None:
     if call.data == 'Да':
         user.uploading_photos = True
 
-        keyboard = types.InlineKeyboardMarkup(row_width=5)
-        keys = [types.InlineKeyboardButton(text=f'{v}', callback_data=k) for k, v in numbers_translating.items()]
+        keyboard = InlineKeyboardMarkup(row_width=5)
+        keys = [InlineKeyboardButton(text=f'{v}', callback_data=k) for k, v in numbers_translating.items()]
         keyboard.add(*keys)
         bot.send_message(user.user_id, 'Сколько фотографий вывести?', reply_markup=keyboard)
 
@@ -430,8 +429,8 @@ def distance_range(message: Message) -> None:
     else:
         user.max_distance = int(message.text)
 
-        keyboard = types.InlineKeyboardMarkup(row_width=5)
-        keys = [types.InlineKeyboardButton(text=f'{i}', callback_data=f'{i}') for i in range(1, 11)]
+        keyboard = InlineKeyboardMarkup(row_width=5)
+        keys = [InlineKeyboardButton(text=f'{i}', callback_data=f'{i}') for i in range(1, 11)]
         keyboard.add(*keys)
         bot.send_message(user.user_id, 'Сколько отелей вывести в результате?', reply_markup=keyboard)
 
@@ -462,9 +461,9 @@ def clear_history_command(message: Message) -> None:
     logger.info(f'user_id: {message.from_user.id}\t| function: clearhistory_command\t| message: {message.text}')
     user = Users.get_user(message.from_user.id)
 
-    keyboard = types.InlineKeyboardMarkup(row_width=2)
-    key_yes = types.InlineKeyboardButton(text='Да', callback_data='y')
-    key_no = types.InlineKeyboardButton(text='Нет', callback_data='n')
+    keyboard = InlineKeyboardMarkup(row_width=2)
+    key_yes = InlineKeyboardButton(text='Да', callback_data='y')
+    key_no = InlineKeyboardButton(text='Нет', callback_data='n')
     keyboard.add(key_yes, key_no)
     bot.send_message(user.user_id, 'Очистить историю поиска?', reply_markup=keyboard)
 
